@@ -72,8 +72,7 @@ const PAGE_CSS = `
   .action-copy strong { display:block; font-size:13.5px; margin-bottom:3px; }
   .action-copy span { display:block; font-size:11.5px; color:var(--muted); line-height:1.35; }
   .primary .action-copy span { color:rgba(255,255,255,.8); }
-  .action-arrow { font-size:23px; opacity:.55; transition:transform .22s ease,opacity .22s ease; }
-  .action-btn:hover .action-arrow { transform:translateX(4px); opacity:1; }
+  .action-btn:hover
 
   .side-card { position:sticky; top:22px; }
   .plan-hero { border-radius:18px; padding:23px; color:#fff; background:linear-gradient(135deg,#4d69ff,#7048ed 68%,#8c4eea); box-shadow:0 16px 34px rgba(83,80,226,.22); overflow:hidden; position:relative; }
@@ -238,11 +237,11 @@ export default function Profile() {
               <div className="card-wrap" style={{ marginTop: 18 }}>
                 <h2 className="section-title"><span className="section-icon">+</span>Manage account</h2>
                 <div className="action-grid">
-                  <a href="/upgrade" className="action-btn primary"><span className="action-icon">↑</span><span className="action-copy"><strong>Upgrade plan</strong><span>Get more features & benefits</span></span><span className="action-arrow">→</span></a>
-                  <a href="/connected" className="action-btn"><span className="action-icon">▦</span><span className="action-copy"><strong>Change spreadsheet</strong><span>Select a different sheet</span></span><span className="action-arrow">→</span></a>
-                  <a href="/set-password?from=profile" className="action-btn"><span className="action-icon">⌑</span><span className="action-copy"><strong>Change password</strong><span>Update your password</span></span><span className="action-arrow">→</span></a>
-                  <button type="button" onClick={handleChangeEmail} className="action-btn"><span className="action-icon">G</span><span className="action-copy"><strong>Change Gmail account</strong><span>Switch your Gmail account</span></span><span className="action-arrow">→</span></button>
-                  <button type="button" onClick={handleDisconnect} className="action-btn danger"><span className="action-icon">×</span><span className="action-copy"><strong>Disconnect & delete my data</strong><span>Permanently remove your account data. This action cannot be undone.</span></span><span className="action-arrow">→</span></button>
+                  <a href="/upgrade" className="action-btn primary"><span className="action-icon">↑</span><span className="action-copy"><strong>Upgrade plan</strong><span>Get more features & benefits</span></span></a>
+                  <a href="/connected" className="action-btn"><span className="action-icon">▦</span><span className="action-copy"><strong>Change spreadsheet</strong><span>Select a different sheet</span></span></a>
+                  <a href="/set-password?from=profile" className="action-btn"><span className="action-icon">⌑</span><span className="action-copy"><strong>Change password</strong><span>Update your password</span></span></a>
+                  <button type="button" onClick={handleChangeEmail} className="action-btn"><span className="action-icon">G</span><span className="action-copy"><strong>Change Gmail account</strong><span>Switch your Gmail account</span></span></button>
+                  <button type="button" onClick={handleDisconnect} className="action-btn danger"><span className="action-icon">×</span><span className="action-copy"><strong>Disconnect & delete my data</strong><span>Permanently remove your account data. This action cannot be undone.</span></span></button>
                 </div>
                 {status.text && <div className={`status ${status.type}`}>{status.text}</div>}
               </div>
