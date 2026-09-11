@@ -72,7 +72,8 @@ const PAGE_CSS = `
   .action-copy strong { display:block; font-size:13.5px; margin-bottom:3px; }
   .action-copy span { display:block; font-size:11.5px; color:var(--muted); line-height:1.35; }
   .primary .action-copy span { color:rgba(255,255,255,.8); }
-  .action-btn:hover
+  .action-arrow { font-size:23px; opacity:.55; transition:transform .22s ease,opacity .22s ease; }
+  .action-btn:hover .action-arrow { transform:translateX(4px); opacity:1; }
 
   .side-card { position:sticky; top:22px; }
   .plan-hero { border-radius:18px; padding:23px; color:#fff; background:linear-gradient(135deg,#4d69ff,#7048ed 68%,#8c4eea); box-shadow:0 16px 34px rgba(83,80,226,.22); overflow:hidden; position:relative; }

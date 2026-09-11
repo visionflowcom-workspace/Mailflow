@@ -48,7 +48,11 @@ const PAGE_CSS = `
   .to-row { display: flex; align-items: center; justify-content: space-between; }
   .cc-bcc-toggle { font-size: 12.5px; color: var(--accent-text); font-weight: 600; cursor: pointer; user-select: none; }
   .hint-inline { font-weight: 400; color: var(--muted); font-size: 11.5px; }
-  .editor-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; background: #fafaff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; box-shadow: 0 4px 14px rgba(80,60,200,0.05); }
+  .editor-toolbar { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; background: #fafaff; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; box-shadow: 0 4px 14px rgba(80,60,200,0.05); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #9b98a5 transparent; }
+  .editor-toolbar::-webkit-scrollbar { height: 7px; }
+  .editor-toolbar::-webkit-scrollbar-track { background: transparent; }
+  .editor-toolbar::-webkit-scrollbar-thumb { background: #9b98a5; border-radius: 999px; }
+  .editor-toolbar button, .editor-toolbar select, .editor-toolbar .swatch-wrap { flex: 0 0 auto; }
   .editor-toolbar button { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; color: var(--ink); display: flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; transition: background 0.15s; }
   .editor-toolbar button:hover { background: #eeecfd; }
   .editor-toolbar select, .editor-toolbar .swatch-wrap { border: 1px solid var(--line); border-radius: 8px; font-size: 13px; background: #fff; height: 38px; display: flex; align-items: center; }
@@ -60,6 +64,17 @@ const PAGE_CSS = `
   .rich-editor { width: 100%; min-height: 180px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; line-height: 1.6; background: #faf9ff; overflow-y: auto; }
   .rich-editor:focus { outline: none; border-color: var(--accent1); background: #fff; }
   .rich-editor:empty::before { content: attr(data-placeholder); color: #9ca3af; }
+  .rich-editor .email-shape { position: relative; cursor: pointer; border-radius: 8px; transition: outline-color .12s ease; outline: 2px solid transparent; outline-offset: 3px; }
+  .rich-editor .email-shape:hover { outline-color: #d8d4fb; }
+  .rich-editor .email-shape.shape-selected { outline-color: var(--accent1); }
+  .rich-editor .email-shape [contenteditable="true"]:focus { outline: none; }
+  .shape-toolbar { position: absolute; z-index: 50; display: flex; align-items: center; gap: 4px; background: #1e1b3a; border-radius: 10px; padding: 6px; box-shadow: 0 8px 24px rgba(20,15,50,0.28); }
+  .shape-toolbar button, .shape-toolbar .shape-tb-swatch { background: transparent; border: none; color: #fff; font-size: 13px; padding: 6px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .shape-toolbar button:hover { background: rgba(255,255,255,0.14); }
+  .shape-toolbar .shape-tb-swatch input[type="color"] { width: 18px; height: 18px; border: none; padding: 0; background: none; cursor: pointer; }
+  .shape-toolbar .shape-tb-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+  .shape-toolbar select { background: #2c2856; color: #fff; border: none; border-radius: 6px; font-size: 12.5px; padding: 5px 6px; }
+  .insert-shape-btn { display: flex; align-items: center; gap: 5px; }
   .dropzone { display: flex; align-items: center; gap: 20px; border: 2px dashed #c7c2f0; border-radius: 14px; background: #fafaff; padding: 14px 24px; cursor: pointer; }
   .dropzone.dragover { background: #f0eefe; border-color: var(--accent1); }
   .dropzone .choose-btn { display: flex; align-items: center; gap: 8px; background: linear-gradient(90deg, var(--accent1), var(--accent2)); color: #fff; border: none; border-radius: 10px; padding: 12px 22px; font-size: 14.5px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
@@ -112,14 +127,21 @@ const PAGE_CSS = `
   .modal-box p { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0 0 24px; }
   .modal-box .modal-btn-primary { width: 100%; padding: 13px; border: none; border-radius: 10px; background: linear-gradient(90deg, var(--accent1), var(--accent2)); color: #fff; font-weight: 600; font-size: 14.5px; cursor: pointer; margin-bottom: 10px; }
   .modal-box .modal-btn-secondary { width: 100%; padding: 11px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--muted); font-weight: 600; font-size: 13.5px; cursor: pointer; }
+  .save-tpl-box .modal-icon { background: #eeecfd; }
+  .save-tpl-input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; background: #faf9ff; margin-bottom: 6px; text-align: left; }
+  .save-tpl-input:focus { outline: none; border-color: var(--accent1); background: #fff; }
+  .save-tpl-error { color: #d5473a; font-size: 12.5px; margin: 0 0 14px; text-align: left; }
   .template-strip { display: flex; gap: 10px; width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 0 10px; margin-bottom: 6px; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: #9b98a5 transparent; }
   .template-strip::-webkit-scrollbar { height: 8px; }
   .template-strip::-webkit-scrollbar-track { background: transparent; }
   .template-strip::-webkit-scrollbar-thumb { background: #9b98a5; border-radius: 999px; }
   .template-strip::-webkit-scrollbar-thumb:hover { background: #777487; }
-  .template-card { flex: 0 0 108px; width: 108px; height: 90px; min-height: 90px; box-sizing: border-box; border: 1px solid #dfdded; border-radius: 12px; background: #faf9ff; padding: 9px 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #29264b; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease; }
+  .template-card { position: relative; flex: 0 0 108px; width: 108px; height: 90px; min-height: 90px; box-sizing: border-box; border: 1px solid #dfdded; border-radius: 12px; background: #faf9ff; padding: 9px 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #29264b; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease; }
   .template-card:hover { transform: translateY(-2px); border-color: #b9b3f5; background: #f7f5ff; box-shadow: 0 6px 15px rgba(75,63,170,.10); }
   .template-card.active { border: 2px solid var(--accent1); background: #efedff; box-shadow: 0 5px 14px rgba(75,63,170,.10); }
+  .template-card.locked { opacity: .6; background: #f3f2f8; }
+  .template-card.locked:hover { border-color: #dfdded; box-shadow: none; }
+  .template-card .t-lock { position: absolute; top: 5px; right: 6px; font-size: 11px; line-height: 1; }
   .template-card .t-icon { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; margin-bottom: 7px; color: #29264b; }
   .template-card .t-icon svg { width: 24px; height: 24px; display: block; }
   .template-card .t-name { font-size: 11.5px; line-height: 1.3; font-weight: 600; color: var(--ink); white-space: normal; }
@@ -142,11 +164,134 @@ export default function Campaign() {
   const [showOutOfCredits, setShowOutOfCredits] = useState(false);
   const [outOfCreditsMsg, setOutOfCreditsMsg] = useState('');
   const [activeTemplate, setActiveTemplate] = useState('blank');
+  const [customTemplates, setCustomTemplates] = useState([]);
+  const [templatesLocked, setTemplatesLocked] = useState(false);
 
-  function pickTemplate(t) {
+  // Custom templates now live on the server, keyed to the signed-in
+  // account's session cookie (see pages/api/templates.js) — so a saved
+  // template is private to whoever created it and follows them across
+  // devices, instead of sitting in that one browser's localStorage where
+  // anyone using the same machine could see or edit it.
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/templates', { credentials: 'same-origin' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data.templates)) setCustomTemplates(data.templates);
+      } catch (err) { /* ignore — falls back to the built-in templates only */ }
+    })();
+  }, []);
+
+  function pickTemplate(t, locked) {
+    if (locked && t.id !== 'blank') {
+      window.location.href = '/upgrade';
+      return;
+    }
     setActiveTemplate(t.id);
     if (subjectRef.current) subjectRef.current.value = t.subject;
     if (bodyEditorRef.current) bodyEditorRef.current.innerHTML = t.bodyHtml;
+  }
+
+  // --- Save-as-template modal (replaces the old browser prompt()) ---
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveTemplateName, setSaveTemplateName] = useState('');
+  const [saveTemplateError, setSaveTemplateError] = useState('');
+  const [savingTemplate, setSavingTemplate] = useState(false);
+
+  function handleSaveTemplate() {
+    const subject = subjectRef.current?.value || '';
+    const bodyHtml = bodyEditorRef.current?.innerHTML || '';
+    if (!subject.trim() && !bodyHtml.trim()) {
+      alert('Write a subject or body first, then save it as a template.');
+      return;
+    }
+    setSaveTemplateName('');
+    setSaveTemplateError('');
+    setShowSaveModal(true);
+  }
+
+  async function confirmSaveTemplate() {
+    const name = saveTemplateName.trim();
+    if (!name) {
+      setSaveTemplateError('Give your template a name.');
+      return;
+    }
+    const subject = subjectRef.current?.value || '';
+    const bodyHtml = bodyEditorRef.current?.innerHTML || '';
+
+    setSavingTemplate(true);
+    setSaveTemplateError('');
+    try {
+      const res = await fetch('/api/templates', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, subject, bodyHtml }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not save the template.');
+      setCustomTemplates((prev) => [...prev, data.template]);
+      setActiveTemplate(data.template.id);
+      setShowSaveModal(false);
+    } catch (err) {
+      setSaveTemplateError(err.message || 'Could not save the template.');
+    } finally {
+      setSavingTemplate(false);
+    }
+  }
+
+  // --- Set-link modal (replaces the old browser prompt() dialogs used by
+  // the "insert link" toolbar button and the button/image shape toolbars) ---
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkModalTitle, setLinkModalTitle] = useState('Insert link');
+  const [linkModalIcon, setLinkModalIcon] = useState('🔗');
+  const [linkModalPlaceholder, setLinkModalPlaceholder] = useState('https://example.com');
+  const [linkModalValue, setLinkModalValue] = useState('');
+  const [linkModalError, setLinkModalError] = useState('');
+  const linkModalOnConfirmRef = useRef(null);
+
+  // Called from the vanilla-DOM editor code below (via openLinkModalRef,
+  // since that effect only runs once and can't see fresh React state).
+  function openLinkModal({ title, icon, placeholder, initialValue, onConfirm }) {
+    setLinkModalTitle(title);
+    setLinkModalIcon(icon || '🔗');
+    setLinkModalPlaceholder(placeholder || 'https://example.com');
+    setLinkModalValue(initialValue || '');
+    setLinkModalError('');
+    linkModalOnConfirmRef.current = onConfirm;
+    setShowLinkModal(true);
+  }
+  const openLinkModalRef = useRef(openLinkModal);
+  openLinkModalRef.current = openLinkModal;
+
+  function confirmLinkModal() {
+    const url = linkModalValue.trim();
+    if (!url) {
+      setLinkModalError('Enter a URL first.');
+      return;
+    }
+    linkModalOnConfirmRef.current?.(url);
+    setShowLinkModal(false);
+  }
+
+  async function handleDeleteTemplate(id, e) {
+    e.stopPropagation();
+    if (!confirm('Delete this saved template?')) return;
+    const prev = customTemplates;
+    setCustomTemplates(prev.filter((t) => t.id !== id));
+    if (activeTemplate === id) setActiveTemplate('blank');
+    try {
+      const res = await fetch(`/api/templates?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        credentials: 'same-origin',
+      });
+      if (!res.ok) throw new Error();
+    } catch (err) {
+      // Roll back the optimistic removal if the server call failed.
+      setCustomTemplates(prev);
+      alert('Could not delete that template — please try again.');
+    }
   }
 
   const statusRef = useRef(null);
@@ -228,7 +373,23 @@ export default function Campaign() {
         if (res.ok) {
           const data = await res.json();
           updateQuotaUI(data.remainingQuota, data.dailyLimit);
-          if (data.running) setRunningUI(true);
+          if (data.running) {
+            setRunningUI(true);
+            // A campaign was already in progress before this reload — resume
+            // polling so sent/failed counts and the progress bar keep updating
+            // instead of sitting frozen until a brand-new campaign is started.
+            pollStatus();
+          } else if (data.total) {
+            // No campaign running right now, but we have a finished one from
+            // earlier today — show its final numbers instead of a blank state.
+            const donePart = data.sent + data.failed;
+            const pct = data.total ? Math.round((donePart / data.total) * 100) : 0;
+            progressWrap.style.display = 'block';
+            progressBar.style.width = pct + '%';
+            const stoppedNote = data.stoppedEarly ? ' Stopped early by request.' : '';
+            const skippedNote = data.skippedByQuota ? ` ${data.skippedByQuota} skipped due to today's send limit.` : '';
+            showStatus(`Campaign finished. ${data.sent} sent, ${data.failed} failed out of ${data.total}.${stoppedNote}${skippedNote}`, data.failed > 0 ? 'error' : 'success');
+          }
         } else {
           quotaLine.textContent = 'No campaigns run yet today.';
         }
@@ -247,6 +408,7 @@ export default function Campaign() {
           : '';
         planLineRef.current.textContent = `Plan: ${planName}${trialNote}`;
         applyFeatureLocks(data.features);
+        setTemplatesLocked(!data.features.templateDesigns);
       } catch (err) { /* fine */ }
     }
     loadPlan();
@@ -321,14 +483,189 @@ export default function Campaign() {
       bodyEditor.focus();
       document.execCommand('foreColor', false, e.target.value);
     });
-    const insertLinkBtn = document.getElementById('insertLinkBtn');
-    insertLinkBtn.addEventListener('click', () => {
-      const url = prompt('Link URL (include https://):');
-      if (url) {
-        bodyEditor.focus();
-        document.execCommand('createLink', false, url);
+    const highlightColor = document.getElementById('highlightColor');
+    highlightColor.addEventListener('input', (e) => {
+      bodyEditor.focus();
+      // hiliteColor isn't supported in every browser (notably older Safari) —
+      // backColor is the more broadly-supported equivalent.
+      if (!document.execCommand('hiliteColor', false, e.target.value)) {
+        document.execCommand('backColor', false, e.target.value);
       }
     });
+    const clearHighlightBtn = document.getElementById('clearHighlightBtn');
+    clearHighlightBtn.addEventListener('click', () => {
+      bodyEditor.focus();
+      if (!document.execCommand('hiliteColor', false, 'transparent')) {
+        document.execCommand('backColor', false, 'transparent');
+      }
+    });
+    const insertLinkBtn = document.getElementById('insertLinkBtn');
+    let savedSelectionRange = null;
+    insertLinkBtn.addEventListener('click', () => {
+      // Save the current text selection so it survives the modal opening
+      // (clicking into the modal's input moves focus, which clears it).
+      const sel = window.getSelection();
+      savedSelectionRange = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+      openLinkModalRef.current({
+        title: 'Insert link',
+        icon: '🔗',
+        placeholder: 'https://example.com',
+        initialValue: '',
+        onConfirm: (url) => {
+          bodyEditor.focus();
+          if (savedSelectionRange) {
+            const sel2 = window.getSelection();
+            sel2.removeAllRanges();
+            sel2.addRange(savedSelectionRange);
+          }
+          document.execCommand('createLink', false, url);
+        },
+      });
+    });
+
+    // --- Editable "shapes": button / box / divider / spacer / image blocks ---
+    // Each shape is a small self-contained widget dropped into the rich
+    // editor. The outer wrapper is contenteditable="false" so clicking it
+    // selects the whole shape (rather than dropping the text cursor inside
+    // it), while any inner element marked contenteditable="true" stays
+    // independently editable — the standard "editable island" pattern.
+    const SHAPE_HTML = {
+      button: () => `<div class="email-shape shape-button" contenteditable="false" data-shape="button" data-href="#" style="text-align:center;margin:16px 0;"><a href="#" contenteditable="true" style="display:inline-block;background:#6d5ef8;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:13px 32px;border-radius:8px;">Click Here</a></div>`,
+      box: () => `<div class="email-shape shape-box" contenteditable="false" data-shape="box" style="margin:16px 0;"><div contenteditable="true" style="background:#f7f6ff;border:1px solid #e9e6ff;border-radius:10px;padding:18px;font-size:14px;color:#333;line-height:1.6;">Edit this box's text…</div></div>`,
+      divider: () => `<div class="email-shape shape-divider" contenteditable="false" data-shape="divider" style="margin:20px 0;padding:8px 0;"><hr style="border:none;border-top:2px solid #6d5ef8;margin:0;" /></div>`,
+      spacer: () => `<div class="email-shape shape-spacer" contenteditable="false" data-shape="spacer" data-size="medium" style="height:32px;"></div>`,
+      image: () => `<div class="email-shape shape-image" contenteditable="false" data-shape="image" style="text-align:center;margin:16px 0;"><img src="https://placehold.co/560x200?text=Click+to+set+image+URL" style="max-width:100%;border-radius:8px;" /></div>`,
+    };
+    document.querySelectorAll('.insert-shape-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        bodyEditor.focus();
+        const build = SHAPE_HTML[btn.dataset.shape];
+        if (!build) return;
+        // Wrap with zero-width spaces so the cursor always has somewhere to
+        // land right after the shape, even if it was inserted at the end.
+        document.execCommand('insertHTML', false, build() + '<p><br></p>');
+      });
+    });
+
+    let selectedShape = null;
+    const shapeToolbar = document.createElement('div');
+    shapeToolbar.className = 'shape-toolbar';
+    shapeToolbar.style.display = 'none';
+    document.body.appendChild(shapeToolbar);
+
+    function hideShapeToolbar() {
+      shapeToolbar.style.display = 'none';
+      if (selectedShape) selectedShape.classList.remove('shape-selected');
+      selectedShape = null;
+    }
+
+    function positionShapeToolbar(shapeEl) {
+      const rect = shapeEl.getBoundingClientRect();
+      shapeToolbar.style.top = `${window.scrollY + rect.top - 44}px`;
+      shapeToolbar.style.left = `${window.scrollX + rect.left}px`;
+      shapeToolbar.style.display = 'flex';
+    }
+
+    function selectShape(shapeEl) {
+      if (selectedShape) selectedShape.classList.remove('shape-selected');
+      selectedShape = shapeEl;
+      selectedShape.classList.add('shape-selected');
+
+      const type = shapeEl.dataset.shape;
+      let controls = '';
+      if (type === 'button' || type === 'box') {
+        const target = type === 'button' ? shapeEl.querySelector('a') : shapeEl.querySelector('div');
+        const currentColor = target ? rgbToHex(target.style.backgroundColor) : '#6d5ef8';
+        controls += `<label class="shape-tb-swatch" title="Background color">🎨<input type="color" id="shapeColorInput" value="${currentColor}" /></label><span class="shape-tb-sep"></span>`;
+      }
+      if (type === 'divider') {
+        const hr = shapeEl.querySelector('hr');
+        const currentColor = hr ? rgbToHex(hr.style.borderTopColor) : '#6d5ef8';
+        controls += `<label class="shape-tb-swatch" title="Divider color">🎨<input type="color" id="shapeColorInput" value="${currentColor}" /></label><span class="shape-tb-sep"></span>`;
+      }
+      if (type === 'button') {
+        controls += `<button type="button" id="shapeLinkBtn" title="Set link">🔗 Link</button><span class="shape-tb-sep"></span>`;
+      }
+      if (type === 'image') {
+        controls += `<button type="button" id="shapeLinkBtn" title="Set image URL">🖼 Image URL</button><span class="shape-tb-sep"></span>`;
+      }
+      if (type === 'spacer') {
+        controls += `<select id="shapeSizeSelect">
+          <option value="small" ${shapeEl.dataset.size === 'small' ? 'selected' : ''}>Small</option>
+          <option value="medium" ${(!shapeEl.dataset.size || shapeEl.dataset.size === 'medium') ? 'selected' : ''}>Medium</option>
+          <option value="large" ${shapeEl.dataset.size === 'large' ? 'selected' : ''}>Large</option>
+        </select><span class="shape-tb-sep"></span>`;
+      }
+      controls += `<button type="button" id="shapeDeleteBtn" title="Delete">🗑 Delete</button>`;
+      shapeToolbar.innerHTML = controls;
+      positionShapeToolbar(shapeEl);
+
+      const colorInput = document.getElementById('shapeColorInput');
+      if (colorInput) {
+        colorInput.addEventListener('input', (e) => {
+          if (type === 'button') shapeEl.querySelector('a').style.background = e.target.value;
+          if (type === 'box') shapeEl.querySelector('div').style.background = e.target.value;
+          if (type === 'divider') shapeEl.querySelector('hr').style.borderTopColor = e.target.value;
+        });
+      }
+      const linkBtn = document.getElementById('shapeLinkBtn');
+      if (linkBtn) {
+        linkBtn.addEventListener('click', () => {
+          if (type === 'button') {
+            const a = shapeEl.querySelector('a');
+            openLinkModalRef.current({
+              title: 'Set button link',
+              icon: '🔗',
+              placeholder: 'https://example.com',
+              initialValue: a.getAttribute('href') || '',
+              onConfirm: (url) => a.setAttribute('href', url),
+            });
+          } else if (type === 'image') {
+            const img = shapeEl.querySelector('img');
+            openLinkModalRef.current({
+              title: 'Set image URL',
+              icon: '🖼️',
+              placeholder: 'https://example.com/image.jpg',
+              initialValue: img.getAttribute('src') || '',
+              onConfirm: (url) => img.setAttribute('src', url),
+            });
+          }
+        });
+      }
+      const sizeSelect = document.getElementById('shapeSizeSelect');
+      if (sizeSelect) {
+        sizeSelect.addEventListener('change', (e) => {
+          const heights = { small: 16, medium: 32, large: 64 };
+          shapeEl.dataset.size = e.target.value;
+          shapeEl.style.height = `${heights[e.target.value]}px`;
+          positionShapeToolbar(shapeEl);
+        });
+      }
+      document.getElementById('shapeDeleteBtn').addEventListener('click', () => {
+        shapeEl.remove();
+        hideShapeToolbar();
+      });
+    }
+
+    function rgbToHex(rgb) {
+      if (!rgb) return '#6d5ef8';
+      const m = rgb.match(/\d+/g);
+      if (!m) return rgb.startsWith('#') ? rgb : '#6d5ef8';
+      return '#' + m.slice(0, 3).map((n) => (+n).toString(16).padStart(2, '0')).join('');
+    }
+
+    bodyEditor.addEventListener('click', (e) => {
+      const shapeEl = e.target.closest('.email-shape');
+      if (shapeEl) {
+        selectShape(shapeEl);
+      } else {
+        hideShapeToolbar();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.shape-toolbar') && !e.target.closest('.email-shape')) hideShapeToolbar();
+    });
+    window.addEventListener('scroll', () => { if (selectedShape) positionShapeToolbar(selectedShape); }, true);
 
     ccBccToggleRef.current.addEventListener('click', () => {
       const fields = ccBccFieldsRef.current;
@@ -537,7 +874,10 @@ export default function Campaign() {
             <p className="lead">Write the subject and email body below. Use <code>{'{{name}}'}</code>, <code>{'{{company}}'}</code>, or any other column header from your sheet as a placeholder — it'll be swapped in automatically for each recipient.</p>
 
             <form id="campaign-form">
-              <label>🎨 Start from a template</label>
+              <div className="to-row" style={{ marginTop: 0 }}>
+                <label style={{ margin: 0 }}>🎨 Start from a template</label>
+                <span className="cc-bcc-toggle" onClick={handleSaveTemplate}>💾 Save as template</span>
+              </div>
               <div className="template-strip">
                 {EMAIL_TEMPLATES.map((t, index) => {
                   const icons = [
@@ -556,25 +896,53 @@ export default function Campaign() {
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 17 17.5 4.5M12.5 4.5h5v5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   ];
 
+                  const isLocked = templatesLocked && t.id !== 'blank';
                   return (
                     <div
                       key={t.id}
-                      className={`template-card ${activeTemplate === t.id ? 'active' : ''}`}
-                      onClick={() => pickTemplate(t)}
+                      className={`template-card ${activeTemplate === t.id ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
+                      onClick={() => pickTemplate(t, templatesLocked)}
                       role="button"
                       tabIndex={0}
+                      title={isLocked ? 'Premium design — upgrade to Pro or Business to use it' : undefined}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
-                          pickTemplate(t);
+                          pickTemplate(t, templatesLocked);
                         }
                       }}
                     >
+                      {isLocked && <span className="t-lock">🔒</span>}
                       <div className="t-icon">{icons[index] || icons[0]}</div>
                       <div className="t-name">{t.name}</div>
                     </div>
                   );
                 })}
+                {customTemplates.map((t) => (
+                  <div
+                    key={t.id}
+                    className={`template-card ${activeTemplate === t.id ? 'active' : ''}`}
+                    onClick={() => pickTemplate(t)}
+                    role="button"
+                    tabIndex={0}
+                    style={{ position: 'relative' }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        pickTemplate(t);
+                      }
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteTemplate(t.id, e)}
+                      title="Delete template"
+                      style={{ position: 'absolute', top: 4, right: 4, width: 18, height: 18, lineHeight: '16px', padding: 0, border: 'none', borderRadius: '50%', background: '#fdeceb', color: '#d5473a', fontSize: 11, cursor: 'pointer' }}
+                    >✕</button>
+                    <div className="t-icon">⭐</div>
+                    <div className="t-name">{t.name}</div>
+                  </div>
+                ))}
               </div>
 
               <div className="to-row">
@@ -603,9 +971,14 @@ export default function Campaign() {
                   <option value="7">Huge</option>
                 </select>
                 <label className="swatch-wrap" title="Text color">
-                  <input type="color" id="textColor" defaultValue="#1e1b3a" />
+                  🎨 <input type="color" id="textColor" defaultValue="#1e1b3a" />
                   <span className="chevron">▾</span>
                 </label>
+                <label className="swatch-wrap" title="Highlight color">
+                  🖍️ <input type="color" id="highlightColor" defaultValue="#fff59d" />
+                  <span className="chevron">▾</span>
+                </label>
+                <button type="button" id="clearHighlightBtn" title="Remove highlight">🚫🖍️</button>
                 <span className="tb-sep"></span>
                 <button type="button" data-cmd="insertUnorderedList" title="Bulleted list">☰</button>
                 <button type="button" data-cmd="insertOrderedList" title="Numbered list">☰¹</button>
@@ -614,8 +987,15 @@ export default function Campaign() {
                 <span className="tb-sep"></span>
                 <button type="button" id="insertLinkBtn" title="Insert link">🔗</button>
                 <button type="button" data-cmd="removeFormat" title="Clear formatting">✕ Format <span className="chevron">▾</span></button>
+                <span className="tb-sep"></span>
+                <button type="button" className="insert-shape-btn" data-shape="button" title="Insert a button">🔲 Button</button>
+                <button type="button" className="insert-shape-btn" data-shape="box" title="Insert a text box">▭ Box</button>
+                <button type="button" className="insert-shape-btn" data-shape="divider" title="Insert a divider">➖ Divider</button>
+                <button type="button" className="insert-shape-btn" data-shape="spacer" title="Insert a spacer">↕ Spacer</button>
+                <button type="button" className="insert-shape-btn" data-shape="image" title="Insert an image">🖼 Image</button>
               </div>
               <div id="body" ref={bodyEditorRef} className="rich-editor" contentEditable="true" data-placeholder="Hi {{name}}, ..." suppressContentEditableWarning></div>
+              <p className="hint-inline" style={{ marginTop: 10, marginBottom: 18 }}>Click any inserted shape to recolor, relink, resize, or delete it.</p>
 
               <label>📎 Attachments <span className="hint-inline">(sent with every email — max ~24MB total)</span></label>
               <div className="dropzone" id="dropzone" ref={dropzoneRef}>
@@ -698,6 +1078,56 @@ export default function Campaign() {
               onClick={() => { window.location.href = '/upgrade'; }}
             >⭐ Upgrade your plan</button>
             <button className="modal-btn-secondary" onClick={() => setShowOutOfCredits(false)}>Not now</button>
+          </div>
+        </div>
+      )}
+
+      {showSaveModal && (
+        <div className="modal-overlay" onClick={() => !savingTemplate && setShowSaveModal(false)}>
+          <div className="modal-box save-tpl-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">💾</div>
+            <h2>Save as template</h2>
+            <p>This template is saved to your account only — no one else can see or use it.</p>
+            <input
+              type="text"
+              autoFocus
+              className="save-tpl-input"
+              placeholder="e.g. Monthly Newsletter"
+              value={saveTemplateName}
+              maxLength={60}
+              onChange={(e) => { setSaveTemplateName(e.target.value); setSaveTemplateError(''); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') confirmSaveTemplate(); }}
+            />
+            {saveTemplateError && <p className="save-tpl-error">{saveTemplateError}</p>}
+            <button className="modal-btn-primary" disabled={savingTemplate} onClick={confirmSaveTemplate}>
+              {savingTemplate ? 'Saving…' : '💾 Save template'}
+            </button>
+            <button className="modal-btn-secondary" disabled={savingTemplate} onClick={() => setShowSaveModal(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {showLinkModal && (
+        <div className="modal-overlay" onClick={() => setShowLinkModal(false)}>
+          {/* Reuses save-tpl-box / save-tpl-input so this matches the other
+              modals exactly — same icon background, input padding, and
+              button styling instead of introducing a one-off look. */}
+          <div className="modal-box save-tpl-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon">{linkModalIcon}</div>
+            <h2>{linkModalTitle}</h2>
+            <p>Paste or type the destination URL, including https://</p>
+            <input
+              type="text"
+              autoFocus
+              className="save-tpl-input"
+              placeholder={linkModalPlaceholder}
+              value={linkModalValue}
+              onChange={(e) => { setLinkModalValue(e.target.value); setLinkModalError(''); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') confirmLinkModal(); }}
+            />
+            {linkModalError && <p className="save-tpl-error">{linkModalError}</p>}
+            <button className="modal-btn-primary" onClick={confirmLinkModal}>✓ Apply link</button>
+            <button className="modal-btn-secondary" onClick={() => setShowLinkModal(false)}>Cancel</button>
           </div>
         </div>
       )}

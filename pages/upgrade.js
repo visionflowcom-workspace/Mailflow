@@ -12,8 +12,8 @@ const PAGE_CSS = `
 
 const FALLBACK_FEATURES = {
   free: ['50 send credits every day', 'Basic email campaigns', 'Spreadsheet recipient import', '3-day trial'],
-  pro: ['450 send credits every day', 'File attachments', 'CC / BCC support', 'Priority upgrade access', 'Share quota across up to 2 email accounts'],
-  business: ['1,000 send credits every day', 'File attachments', 'CC / BCC support', 'Priority upgrade access', 'Share quota across up to 3 email accounts'],
+  pro: ['450 send credits every day', 'File attachments', 'CC / BCC support', 'Premium template designs', 'Priority upgrade access', 'Share quota across up to 2 email accounts'],
+  business: ['1,000 send credits every day', 'File attachments', 'CC / BCC support', 'Premium template designs', 'Priority upgrade access', 'Share quota across up to 3 email accounts'],
 };
 
 export default function Upgrade(){
