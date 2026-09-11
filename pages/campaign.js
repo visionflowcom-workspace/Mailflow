@@ -720,8 +720,19 @@ export default function Campaign() {
       return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
 
+    const IMAGE_EXTENSIONS = new Set(['png','jpg','jpeg','gif','webp','svg','avif','bmp','ico','tif','tiff']);
+
+    function isSupportedImage(file) {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      return (file.type && file.type.startsWith('image/')) || IMAGE_EXTENSIONS.has(ext);
+    }
+
     async function addFiles(fileList) {
       for (const file of fileList) {
+        if (!isSupportedImage(file)) {
+          showStatus(`Unsupported file: ${file.name}. Please choose an image (PNG, JPG, JPEG, GIF, WEBP, SVG, AVIF, BMP, ICO, TIF or TIFF).`, 'error');
+          continue;
+        }
         try {
           const dataBase64 = await fileToBase64(file);
           attachedFilesRef.current.push({
@@ -999,14 +1010,14 @@ export default function Campaign() {
 
               <label>📎 Attachments <span className="hint-inline">(sent with every email — max ~24MB total)</span></label>
               <div className="dropzone" id="dropzone" ref={dropzoneRef}>
-                <button type="button" className="choose-btn" ref={chooseFilesBtnRef}>📄⬆ Choose Files</button>
+                <button type="button" className="choose-btn" ref={chooseFilesBtnRef}>🖼️⬆ Choose Images</button>
                 <div className="dz-divider"></div>
                 <div className="dz-text">
                   <div className="dz-main" ref={dzMainTextRef}>No file chosen</div>
-                  <div className="dz-sub">or drag and drop files here</div>
+                  <div className="dz-sub">PNG, JPG, JPEG, GIF, WEBP, SVG, AVIF, BMP, ICO, TIF or TIFF</div>
                 </div>
                 <div className="dz-cloud">☁️</div>
-                <input type="file" ref={attachmentInputRef} multiple />
+                <input type="file" ref={attachmentInputRef} multiple accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml,image/avif,image/bmp,image/x-icon,image/tiff,.png,.jpg,.jpeg,.gif,.webp,.svg,.avif,.bmp,.ico,.tif,.tiff" />
               </div>
               <div ref={attachmentListRef} className="attachment-list"></div>
 

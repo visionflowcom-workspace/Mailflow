@@ -9,6 +9,16 @@ export default async function handler(req, res) {
 
   const { email, to, cc, bcc, subject, body, attachments } = req.body;
   try {
+    const allowedImageExts = new Set(['png','jpg','jpeg','gif','webp','svg','avif','bmp','ico','tif','tiff']);
+    const imageAttachments = attachments || [];
+    const invalidAttachment = imageAttachments.find((f) => {
+      const ext = (f.filename?.split('.').pop() || '').toLowerCase();
+      return !(f.mimeType?.startsWith('image/') || allowedImageExts.has(ext));
+    });
+    if (invalidAttachment) {
+      return res.status(400).json({ error: 'Only image attachments are supported (PNG, JPG, JPEG, GIF, WEBP, SVG, AVIF, BMP, ICO, TIF or TIFF).' });
+    }
+
     const clients = readClients();
     const client = clients[email];
     if (!client) return res.status(404).json({ error: 'Client not found.' });
