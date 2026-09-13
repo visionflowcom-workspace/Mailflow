@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   const email = getSessionEmail(req);
   if (!email) return res.status(401).json({ error: 'Not signed in.' });
 
-  const clients = readClients();
+  const clients = await readClients();
   if (!clients[email]) return res.status(404).json({ error: 'Account not found.' });
   if (!Array.isArray(clients[email].templates)) clients[email].templates = [];
 
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
       updatedAt: now,
     };
     clients[email].templates.push(template);
-    saveClients(clients);
+    await saveClients(clients);
     return res.status(201).json({ template });
   }
 
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     if (typeof subject === 'string') tpl.subject = subject;
     if (typeof bodyHtml === 'string') tpl.bodyHtml = bodyHtml;
     tpl.updatedAt = new Date().toISOString();
-    saveClients(clients);
+    await saveClients(clients);
     return res.json({ template: tpl });
   }
 
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
     if (clients[email].templates.length === before) {
       return res.status(404).json({ error: 'Template not found.' });
     }
-    saveClients(clients);
+    await saveClients(clients);
     return res.json({ success: true });
   }
 

@@ -8,12 +8,12 @@ function clearGroup(clients, members) {
   }
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!isAdmin(req)) return res.status(401).json({ error: 'Not logged in as admin.' });
 
   const { ownerEmail, memberEmails = [], slots } = req.body || {};
-  const clients = readClients();
+  const clients = await readClients();
   const normalizedOwnerEmail = String(ownerEmail || '').trim().toLowerCase();
   const owner = clients[normalizedOwnerEmail];
   if (!owner) return res.status(404).json({ error: 'Subscription owner not found.' });
@@ -25,7 +25,7 @@ export default function handler(req, res) {
   if (requestedSlots === 1) {
     const oldMembers = owner.quotaShare?.members || [normalizedOwnerEmail];
     clearGroup(clients, oldMembers);
-    saveClients(clients);
+    await saveClients(clients);
     return res.json({ success: true, message: 'Quota sharing disabled for this account.' });
   }
 
@@ -68,7 +68,7 @@ export default function handler(req, res) {
   };
 
   for (const email of members) clients[email].quotaShare = share;
-  saveClients(clients);
+  await saveClients(clients);
 
   res.json({ success: true, share, dailyLimit: PLANS[plan].dailyLimit });
 }

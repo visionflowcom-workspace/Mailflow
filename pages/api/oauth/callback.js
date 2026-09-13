@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     const { data: profile } = await oauth2.userinfo.get();
     const newEmail = profile.email;
 
-    const clients = readClients();
+    const clients = await readClients();
     const oldEmail = getMigrationEmail(req);
 
     // --- Handling an in-progress "Change Gmail account" request ---
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
           tokens,
         };
         delete clients[oldEmail];
-        saveClients(clients);
+        await saveClients(clients);
         setSessionCookie(res, newEmail);
         return res.redirect('/profile?changed=1');
       }
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         // That Gmail is already registered as a separate account here — refuse
         // to overwrite it. Just log them into that existing account instead.
         clients[newEmail].tokens = tokens;
-        saveClients(clients);
+        await saveClients(clients);
         setSessionCookie(res, newEmail);
         return res.redirect('/profile?changed=blocked');
       }
@@ -61,8 +61,8 @@ export default async function handler(req, res) {
       plan: clients[newEmail]?.plan || 'free',
       connectedAt: clients[newEmail]?.connectedAt || new Date().toISOString(),
     };
-    saveClients(clients);
-    touchLastSeen(newEmail);
+    await saveClients(clients);
+    await touchLastSeen(newEmail);
 
     setSessionCookie(res, newEmail);
 

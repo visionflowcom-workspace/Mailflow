@@ -2,11 +2,11 @@ import { getSessionEmail } from '../../lib/session';
 import { readClients } from '../../lib/store';
 import { PLANS, PAYMENT_METHODS, QR_DETAILS_BY_PLAN, getPlanLimit, getRemainingQuota, LEGACY_FEATURES, isTrialExpired, getTrialDaysLeft } from '../../lib/plans';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const email = getSessionEmail(req);
   if (!email) return res.status(401).json({ error: 'Please log in first.' });
 
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
   if (!client) return res.status(404).json({ error: 'Client not found.' });
 
@@ -15,7 +15,7 @@ export default function handler(req, res) {
     paymentMethods: PAYMENT_METHODS,
     qrByPlan: QR_DETAILS_BY_PLAN,
     currentPlan: client.plan || 'free',
-    remainingQuota: getRemainingQuota(email),
+    remainingQuota: await getRemainingQuota(email),
     dailyLimit: getPlanLimit(client),
     quotaShare: client.quotaShare ? { slots: client.quotaShare.slots, members: client.quotaShare.members, ownerEmail: client.quotaShare.ownerEmail } : null,
     pendingUpgrade: client.pendingUpgrade || null,

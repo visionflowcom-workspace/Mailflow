@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const email = getSessionEmail(req);
   if (!email) return res.status(401).json({ error: 'Please log in first.' });
 
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
   // Microsoft doesn't have a simple equivalent revoke call reachable this way —
   // deleting the stored tokens below is sufficient there.
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   delete clients[email];
-  saveClients(clients);
+  await saveClients(clients);
   delete campaignStatus[email];
 
   clearSessionCookie(res);

@@ -1,15 +1,15 @@
 import { getSessionEmail } from '../../lib/session';
 import { readClients, touchLastSeen } from '../../lib/store';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   const email = getSessionEmail(req);
   if (!email) return res.json({ loggedIn: false });
 
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
   if (!client) return res.json({ loggedIn: false });
 
-  touchLastSeen(email);
+  await touchLastSeen(email);
 
   res.json({
     loggedIn: true,

@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const email = profile.mail || profile.userPrincipalName;
     if (!email) return res.status(500).send('Could not determine your email address from Microsoft.');
 
-    const clients = readClients();
+    const clients = await readClients();
     const isNewClient = !clients[email];
     clients[email] = {
       ...(clients[email] || {}),
@@ -28,8 +28,8 @@ export default async function handler(req, res) {
       plan: clients[email]?.plan || 'free',
       connectedAt: clients[email]?.connectedAt || new Date().toISOString(),
     };
-    saveClients(clients);
-    touchLastSeen(email);
+    await saveClients(clients);
+    await touchLastSeen(email);
 
     setSessionCookie(res, email);
 

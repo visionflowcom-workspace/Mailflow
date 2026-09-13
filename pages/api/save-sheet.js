@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing email or sheetUrl' });
   }
 
-  const clients = readClients();
+  const clients = await readClients();
   if (!clients[email]) {
     return res.status(404).json({ error: 'Client not found. Please connect Gmail first.' });
   }
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   clients[email].contactSource = 'sheet';
   clients[email].contactRows = null;
   clients[email].contactFilename = null;
-  saveClients(clients);
+  await saveClients(clients);
 
   try {
     if (process.env.N8N_WEBHOOK_URL) {

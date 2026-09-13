@@ -21,6 +21,13 @@ All 7 pages and 25 backend routes are ported with the same functionality.
 
 ## Deploying
 - `npm run build` then `npm start` on any always-on Node host (Render, a VPS, etc.) — works exactly like the original.
+- **Client data storage (`data/clients.json`) — required on Render:** Render's Free web services have no durable disk at all — the filesystem resets on every redeploy, crash-restart, and inactivity spin-down/spin-up, which wipes profiles, plans, and trial timers. `lib/store.js` now stores clients in **Upstash Redis** (free tier) instead:
+  1. Create a free Redis database at https://console.upstash.com
+  2. Copy its **REST URL** and **REST Token** from the database's details page
+  3. Add these env vars on your Render service: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+  4. Redeploy.
+  - Without those env vars set, `lib/store.js` falls back to the old local JSON file — fine for local dev, but it will keep resetting on Render (Free or otherwise, unless you separately attach a paid Persistent Disk and set `DATA_DIR`).
+  - `readClients`/`saveClients`/`touchLastSeen` are now `async` — every call site in `pages/api/*` and `lib/*` awaits them.
 - **If deploying to a serverless platform (Vercel):** the campaign-status tracker and login-attempt throttle live in server memory (same design as the original Express app). Serverless instances are short-lived, so this in-memory state can be lost between requests. Swap `campaignStatus`/`loginAttempts` in `lib/plans.js` and `pages/api/login.js` for something external (e.g. Upstash Redis) if you deploy there. Everything else works unchanged.
 
 ## What changed structurally vs. the Express version

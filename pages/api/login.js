@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: `Too many attempts. Try again in ${waitMin} minute(s).` });
   }
 
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
 
   if (!client || !client.passwordHash) {
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
   }
 
   delete loginAttempts[email];
-  touchLastSeen(email);
+  await touchLastSeen(email);
   setSessionCookie(res, email);
   res.json({ success: true, hasSheet: !!client.sheetUrl });
 }

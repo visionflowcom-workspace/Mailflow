@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Password must be at least 8 characters.' });
   }
 
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
   if (!client) return res.status(404).json({ error: 'Client not found.' });
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
   }
 
   client.passwordHash = await bcrypt.hash(password, 10);
-  saveClients(clients);
+  await saveClients(clients);
 
   res.json({ success: true });
 }

@@ -2,10 +2,10 @@ import { isAdmin } from '../../../lib/session';
 import { readClients } from '../../../lib/store';
 import { PLANS } from '../../../lib/plans';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (!isAdmin(req)) return res.status(401).json({ error: 'Not logged in as admin.' });
 
-  const clients = readClients();
+  const clients = await readClients();
   const requests = Object.values(clients)
     .filter((c) => c.pendingUpgrade && c.pendingUpgrade.status === 'pending')
     .map((c) => ({

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (!isAdmin(req)) return res.status(401).json({ error: 'Not logged in as admin.' });
 
   const { email } = req.body;
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
   if (!client) return res.status(404).json({ error: 'User not found.' });
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   }
 
   delete clients[email];
-  saveClients(clients);
+  await saveClients(clients);
   delete campaignStatus[email];
 
   res.json({ success: true });

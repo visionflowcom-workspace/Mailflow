@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Your file must have a column header named 'email'." });
     }
 
-    const clients = readClients();
+    const clients = await readClients();
     const client = clients[email];
     if (!client) return res.status(404).json({ error: 'Client not found. Please connect first.' });
 
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
     client.contactFilename = filename;
     client.contactRows = cleanRows;
     client.sheetUrl = null; // uploading a file replaces a previously-connected sheet
-    saveClients(clients);
+    await saveClients(clients);
 
     res.json({ success: true, rowCount: cleanRows.length, columns: Object.keys(cleanRows[0]) });
   } catch (err) {

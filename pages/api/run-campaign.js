@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Attachments are too large — Gmail allows about 25MB per email.' });
   }
 
-  const clients = readClients();
+  const clients = await readClients();
   const client = clients[email];
   if (!client) return res.status(404).json({ error: 'Client not found. Please connect Gmail first.' });
 
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const remainingQuota = getRemainingQuota(email);
+  const remainingQuota = await getRemainingQuota(email);
   const planLimit = getPlanLimit(client);
   if (remainingQuota <= 0) {
     return res.status(429).json({
@@ -106,7 +106,7 @@ export default async function handler(req, res) {
         if (campaignStatus[email].stopRequested) break;
         // Re-check the shared pool before every send so two accounts in the
         // same quota group can never collectively exceed the subscription cap.
-        if (getRemainingQuota(email) <= 0) {
+        if ((await getRemainingQuota(email)) <= 0) {
           campaignStatus[email].stoppedForQuota = true;
           break;
         }
@@ -133,7 +133,7 @@ export default async function handler(req, res) {
             attachments,
           });
           campaignStatus[email].sent += 1;
-          recordSend(email);
+          await recordSend(email);
         } catch (err) {
           campaignStatus[email].failed += 1;
           campaignStatus[email].errors.push({ to, error: err.message });
